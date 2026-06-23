@@ -5,6 +5,12 @@ import {
   telegramWebhookSecret,
 } from "./config.js";
 import { createBot } from "./bot/createBot.js";
+
+// Регистрация новых API функций для TWA
+export { startShift } from "./api/twa/startShift.js";
+export { finishShift } from "./api/twa/finishShift.js";
+export { addTripPoint } from "./api/twa/addTripPoint.js";
+export { uploadDocument } from "./api/twa/uploadDocument.js";
 export { createArchiveTopic } from "./createArchiveTopic.js";
 
 let bot: ReturnType<typeof createBot> | undefined;
@@ -12,28 +18,13 @@ let bot: ReturnType<typeof createBot> | undefined;
 export const telegramWebhook = onRequest(
   {
     region: "europe-west1",
-    timeoutSeconds: 30,
-    memory: "256MiB",
-    maxInstances: 10,
     secrets: [telegramBotToken, telegramWebhookSecret],
   },
   async (request, response) => {
-    if (request.method !== "POST") {
-      response.status(405).send("Method Not Allowed");
-      return;
-    }
-
-    const suppliedSecret = request.header(
-      "x-telegram-bot-api-secret-token",
-    );
-    if (suppliedSecret !== telegramWebhookSecret.value()) {
-      logger.warn("Rejected Telegram webhook with invalid secret");
-      response.status(401).send("Unauthorized");
-      return;
-    }
-
     bot ??= createBot(telegramBotToken.value());
 
+    // В новой архитектуре бот только приветствует и дает ссылку на TWA
+    // Текстовая обработка в createBot.ts будет максимально упрощена
     try {
       await bot.handleUpdate(request.body);
       response.status(200).send("OK");

@@ -23,6 +23,7 @@ export interface Driver {
   archiveThreadId: number;
   notes: string;
   active: boolean;
+  activeShiftId?: string;
 }
 
 export type DriverDraft = Omit<Driver, "id">;
@@ -33,6 +34,19 @@ export interface ArchiveTopic {
   name: string;
   groupTitle?: string;
   active: boolean;
+}
+
+export interface Shift {
+  id: string;
+  driverId: string;
+  driverName: string;
+  vehicleLabel: string;
+  status: "active" | "completed";
+  startMileage: number;
+  endMileage?: number;
+  distance?: number;
+  startedAt: any;
+  completedAt?: any;
 }
 
 export interface TelegramArchiveSettings {
